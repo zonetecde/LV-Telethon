@@ -1,8 +1,11 @@
 <script>
 	import '../app.css';
+	import { Toaster } from 'svelte-sonner';
 
-	import TelethonLogo from '../logo-telethon.png';
+	import TelethonLogo from '../assets/logo-telethon.png';
 </script>
+
+<Toaster />
 
 <div
 	class="w-screen h-20 bg-[#F5F300] header-bg flex justify-center items-center border-b-2 border-yellow-200 relative"
@@ -16,7 +19,7 @@
 	>
 </div>
 
-<div class="main-bg w-screen h-screen -mt-20 pt-20">
+<div class="main-bg w-screen h-screen -mt-20 pt-20 overflow-x-hidden">
 	<slot />
 </div>
 
