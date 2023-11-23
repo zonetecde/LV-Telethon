@@ -1,9 +1,4 @@
-import { dbConnection } from '../database/db.js';
-import { extname } from 'path';
 import * as fs from 'fs';
-import { pipeline } from 'stream/promises';
-import { promisify } from 'util';
-import fetch from 'node-fetch';
 import type Resource from '../../../Models/Resource.js';
 import type Student from '../../../Models/Student.js';
 import ProjectTable from '../../../Models/ProjectTable.js';

@@ -18,7 +18,7 @@ if (!StudentTable.isInitialized()) {
 	dbConnection.addModels([StudentTable]);
 }
 
-dbConnection.sync({ alter: true }).then(() => {
+dbConnection.sync().then(() => {
 	console.log('Initialized');
 });
 
