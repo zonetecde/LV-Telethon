@@ -15,6 +15,7 @@
 	let projectName: string = '';
 	let description: string = '';
 	let hideOurNames: boolean = false;
+	let isSending: boolean = false;
 
 	onMount(() => {
 		// Ajout des classes
@@ -26,7 +27,7 @@
 	});
 
 	function addStudentButtonClicked() {
-		eleves = [...eleves, new Student('', '', '')];
+		eleves = [...eleves, new Student('', '', eleves[0].classe ?? 'S1')];
 	}
 
 	function removeStudent(student: Student) {
@@ -113,11 +114,19 @@
 	}
 
 	async function sendProject() {
+		if (isSending) {
+			toast.error("Le projet est en cours d'envoi, merci de patientier.");
+			return;
+		}
+
 		// Vérifie qu'il y ai au moins une ressource sélectionnée
 		if (resources.length === 0) {
 			toast.error('Vous devez sélectionner au moins une image, vidéo ou audio.');
 			return;
 		}
+
+		isSending = true;
+		toast.info('Envoi du projet en cours, merci de patienter...');
 
 		// Envoie à l'API les projets
 		const formData = new FormData();
@@ -150,12 +159,17 @@
 			});
 
 			if (response.ok) {
-				console.log('Files uploaded successfully');
+				toast.success('Projet envoyé !');
+				window.location.href = '/merci';
 			} else {
-				console.error('Failed to upload files');
+				toast.error(
+					"Une erreur est survenue lors de l'envoi du projet. Veuillez réessayer plus tard."
+				);
 			}
 		} catch (error) {
 			console.error('Error during file upload:', error);
+		} finally {
+			isSending = false;
 		}
 	}
 </script>
@@ -237,6 +251,11 @@
 					</svg>
 					Ajouter un élève
 				</button>
+
+				<label>
+					<input type="checkbox" class="mt-2" bind:checked={hideOurNames} />
+					Je ne souhaite pas que nos noms apparaissent sur le site
+				</label>
 			</div>
 
 			<div class="mt-2.5 border border-gray-400 p-2 rounded-lg bg-[#F5F7F8]">
@@ -353,19 +372,6 @@
 					{/each}
 				</div>
 			</div>
-
-			<label>
-				<input type="checkbox" class="mt-5" required />
-				Je sais que je ne pourrais pas modifier mon projet après l'avoir envoyé
-			</label>
-			<label>
-				<input type="checkbox" class="mt-2" required />
-				Je sais que le projet sera d'abord envoyé à un modérateur avant d'être publié
-			</label>
-			<label>
-				<input type="checkbox" class="mt-2" bind:checked={hideOurNames} />
-				Je ne souhaite pas que nos noms apparaissent sur le site
-			</label>
 
 			<button
 				type="submit"

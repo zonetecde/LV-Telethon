@@ -68,7 +68,7 @@ export async function POST(request) {
 				const fileData = resourcesData.find((f) => f.nomFichier === file.name);
 				if (fileData) {
 					const results = await ResourceTable.create({
-						nomFichier: fileName,
+						nomFichier: fileData.nomFichier,
 						Path: path,
 						Type: fileData.Type,
 						isMain: fileData.IsMainRessource,
