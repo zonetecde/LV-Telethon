@@ -1,9 +1,9 @@
 import { Sequelize } from '@sequelize/core';
-import ProjectTable from '../../../Models/Project';
-import FileTable from '../../../Models/File';
-import StudentTable from '../../../Models/Student';
+import ProjectTable from '../../../Models/ProjectTable.js';
+import FileTable from '../../../Models/FileTable.js';
+import StudentTable from '../../../Models/StudentTable.js';
 
-const dbConnection = new Sequelize('sqlite:./database/database.db', { logging: false });
+const dbConnection = new Sequelize('sqlite:./database/database.db', { logging: true });
 
 if (!ProjectTable.isInitialized()) {
 	console.log('Initializing project table...');
@@ -18,7 +18,9 @@ if (!StudentTable.isInitialized()) {
 	dbConnection.addModels([StudentTable]);
 }
 
-dbConnection.sync().then(() => {});
+dbConnection.sync({ alter: true }).then(() => {
+	console.log('Initialized');
+});
 
 process.on('exit', () => {
 	console.log('Closing database connection...');

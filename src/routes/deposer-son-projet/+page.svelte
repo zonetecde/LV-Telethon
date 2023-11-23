@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Student } from '../../Models/Student';
-	import Classe from '../../Models/Classe';
 	import { toast } from 'svelte-sonner';
 	import DeleteIcon from '../../assets/delete.svg';
 	import EyeIcon from '../../assets/eye.svg';
+	import Student from '../../Models/Student.js';
+	import Classe from '../../Models/Classe.js';
 
 	let eleves: Student[] = [new Student('', '', '')];
 	let classes: Classe[] = [];
@@ -63,13 +63,13 @@
 	function imagesUploaded(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		if (!event.currentTarget.files) return;
 
-		// Vérifie que les fichiers sélectionnées sont des images
-		let files = Array.from(event.currentTarget.files).filter((file) =>
-			file.type.startsWith('image/')
+		// Vérifie que les fichiers sélectionnées sont des images ou vidéos
+		let files = Array.from(event.currentTarget.files).filter(
+			(file) => file.type.startsWith('image/') || file.type.startsWith('video/')
 		);
 
 		if (files.length === 0) {
-			toast.error('Vous devez sélectionner au moins une image');
+			toast.error('Vous devez sélectionner au moins une image ou vidéo');
 			return;
 		}
 
@@ -77,7 +77,7 @@
 		files = files.filter((file) => !images.some((img) => img.name === file.name));
 
 		if (files.length === 0) {
-			toast.error('Vous avez déjà ajouté ces images');
+			toast.error('Vous avez déjà ajouté ces images ou vidéos');
 			return;
 		}
 
@@ -87,7 +87,7 @@
 
 		images = [...images, ...files];
 
-		toast.success(`${files.length} image(s) importée(s)`);
+		toast.success(`${files.length} image(s) ou vidéo(s) importée(s)`);
 	}
 
 	function removeImage(image: File): any {
@@ -192,7 +192,7 @@
 			</div>
 
 			<div class="mt-2.5 border border-gray-400 p-2 rounded-lg bg-[#F5F7F8]">
-				<p class="text-base">Joindre des images du projet :</p>
+				<p class="text-base">Joindre des images et/ou des vidéos du projet :</p>
 				<div class="flex flex-row">
 					<button class="relative bg-lime-300 px-3 py-1 border border-lime-500 mt-2">
 						<input
@@ -210,13 +210,14 @@
 				</div>
 				<div class="grid grid-cols-6 gap-2 mt-2">
 					{#each images as image}
-						<div class="relative">
+						<div class="relative max-h-56">
 							<button
 								on:click={() => {
 									mainImage = image;
 								}}
+								class="flex justify-center items-center"
 							>
-								<img src={URL.createObjectURL(image)} alt={image.name} />
+								<img src={URL.createObjectURL(image)} alt={image.name} class="object-cover" />
 							</button>
 
 							<button

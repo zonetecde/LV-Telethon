@@ -1,35 +1,22 @@
-import {
-	DataTypes,
-	Model,
-	type InferAttributes,
-	type InferCreationAttributes,
-	type CreationOptional
-} from '@sequelize/core';
+export default class File {
+	id: number | undefined;
+	projectId: number;
+	nomFichier: string;
+	path: string;
+	isImage: boolean;
+	isMainImage: boolean;
 
-import { Attribute, PrimaryKey, AutoIncrement, NotNull } from '@sequelize/core/decorators-legacy';
-
-export default class FileTable extends Model<
-	InferAttributes<FileTable>,
-	InferCreationAttributes<FileTable>
-> {
-	@Attribute(DataTypes.INTEGER)
-	@PrimaryKey
-	@AutoIncrement
-	declare id: CreationOptional<number>;
-
-	@Attribute(DataTypes.INTEGER)
-	@NotNull
-	declare projectId: number;
-
-	@Attribute(DataTypes.STRING)
-	@NotNull
-	declare nomFichier: string;
-
-	@Attribute(DataTypes.STRING)
-	@NotNull
-	declare Path: string;
-
-	@Attribute(DataTypes.BOOLEAN)
-	@NotNull
-	declare isImage: boolean;
+	constructor(
+		projectId: number,
+		nomFichier: string,
+		path: string,
+		isImage: boolean,
+		isMainImage: boolean
+	) {
+		this.projectId = projectId;
+		this.nomFichier = nomFichier;
+		this.path = path;
+		this.isImage = isImage;
+		this.isMainImage = isMainImage;
+	}
 }

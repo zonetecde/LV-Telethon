@@ -1,4 +1,4 @@
-import { dbConnection } from '../database/db';
+import { dbConnection } from '../database/db.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET(request) {
