@@ -14,6 +14,7 @@
 	let fichiers: File[] = [];
 	let projectName: string = '';
 	let description: string = '';
+	let hideOurNames: boolean = false;
 
 	onMount(() => {
 		// Ajout des classes
@@ -131,7 +132,7 @@
 				? 'audio'
 				: 'file';
 
-			var fichier = new Resource(-1, file.name, '', mainImage === file, type as any);
+			var fichier = new Resource(file.name, mainImage === file, type as any);
 			formData.append('resources', file);
 			formData.append('resourcesData', JSON.stringify(fichier));
 		}
@@ -140,6 +141,7 @@
 		formData.append('projectDescription', description);
 
 		formData.append('students', JSON.stringify(eleves));
+		formData.append('hideOurNames', JSON.stringify(hideOurNames));
 
 		try {
 			const response = await fetch('/api/send-project', {
@@ -359,6 +361,10 @@
 			<label>
 				<input type="checkbox" class="mt-2" required />
 				Je sais que le projet sera d'abord envoyé à un modérateur avant d'être publié
+			</label>
+			<label>
+				<input type="checkbox" class="mt-2" bind:checked={hideOurNames} />
+				Je ne souhaite pas que nos noms apparaissent sur le site
 			</label>
 
 			<button

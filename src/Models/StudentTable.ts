@@ -8,6 +8,14 @@ import {
 
 import { Attribute, PrimaryKey, AutoIncrement, NotNull } from '@sequelize/core/decorators-legacy';
 
+/**
+ * Table 'Student' contenant les élèves
+ * @param id Identifiant de l'élève
+ * @param nom Nom de l'élève
+ * @param prenom Prénom de l'élève
+ * @param classe Classe de l'élève
+ * @param projectId Identifiant du projet auquel l'élève appartient
+ */
 export default class StudentTable extends Model<
 	InferAttributes<StudentTable>,
 	InferCreationAttributes<StudentTable>

@@ -1,4 +1,7 @@
-export default class ProjectTable {
+/**
+ * Modèle d'un projet
+ */
+export default class Project {
 	projectName: string;
 	projectDescription: string;
 

@@ -22,10 +22,13 @@ export async function POST(request) {
 		return new Response(JSON.stringify('Nom de projet ou description manquante.'), { status: 400 });
 	}
 
+	const hideOurNames = JSON.parse(formData.getAll('hideOurNames').toString());
+
 	const projectId = (
 		await ProjectTable.create({
 			projectName: projectName.toString(),
-			projectDescription: projectDescription.toString()
+			projectDescription: projectDescription.toString(),
+			hideStudentsNames: hideOurNames
 		})
 	).getDataValue('id');
 
