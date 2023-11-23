@@ -3,20 +3,20 @@ export default class File {
 	projectId: number;
 	nomFichier: string;
 	path: string;
-	isImage: boolean;
-	isMainImage: boolean;
+	Type: 'video' | 'audio' | 'image' | 'other';
+	IsMainRessource: boolean;
 
 	constructor(
 		projectId: number,
 		nomFichier: string,
 		path: string,
-		isImage: boolean,
-		isMainImage: boolean
+		isMainRessource: boolean,
+		type: 'video' | 'audio' | 'image' | 'other'
 	) {
 		this.projectId = projectId;
 		this.nomFichier = nomFichier;
 		this.path = path;
-		this.isImage = isImage;
-		this.isMainImage = isMainImage;
+		this.IsMainRessource = isMainRessource;
+		this.Type = type;
 	}
 }

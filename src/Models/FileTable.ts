@@ -29,30 +29,10 @@ export default class FileTable extends Model<
 	@NotNull
 	declare Path: string;
 
-	/*
-	 * Fichier annexe (ni une image, ni une vidéo) ?
-	 */
-	@Attribute(DataTypes.BOOLEAN)
+	@Attribute(DataTypes.STRING)
 	@NotNull
-	declare IsFile: boolean;
+	declare Type: 'video' | 'audio' | 'image' | 'other';
 
-	/*
-	 * Est une image ?
-	 */
-	@Attribute(DataTypes.BOOLEAN)
-	@NotNull
-	declare isImage: boolean;
-
-	/*
-	 * Est une vidéo ?
-	 */
-	@Attribute(DataTypes.BOOLEAN)
-	@NotNull
-	declare isVideo: boolean;
-
-	/*
-	 * Est l'image ou la vidéo mis en couverture ? ?
-	 */
 	@Attribute(DataTypes.BOOLEAN)
 	@NotNull
 	declare isMain: boolean;

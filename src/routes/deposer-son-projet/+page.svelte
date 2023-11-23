@@ -8,7 +8,7 @@
 
 	let eleves: Student[] = [new Student('', '', '')];
 	let classes: Classe[] = [];
-	let images: File[] = [];
+	let resources: File[] = [];
 	let mainImage: File | null = null;
 	let fichiers: File[] = [];
 
@@ -53,9 +53,16 @@
 
 		// Si il y a une image, on prévient l'utilisateur que ce n'est
 		// pas la bonne catégorie
-		if (files.some((file) => file.type.startsWith('image/'))) {
+		if (
+			files.some(
+				(file) =>
+					file.type.startsWith('image/') ||
+					file.type.startsWith('video/') ||
+					file.type.startsWith('audio/')
+			)
+		) {
 			toast.warning(
-				'Les images devraient être ajoutées dans la séction "Joindre des images du projet".'
+				'Les images, vidéos et audios devraient être ajoutés dans la séction "Joindre des images du projet".'
 			);
 		}
 	}
@@ -65,40 +72,71 @@
 
 		// Vérifie que les fichiers sélectionnées sont des images ou vidéos
 		let files = Array.from(event.currentTarget.files).filter(
-			(file) => file.type.startsWith('image/') || file.type.startsWith('video/')
+			(file) =>
+				file.type.startsWith('image/') ||
+				file.type.startsWith('video/') ||
+				file.type.startsWith('audio/')
 		);
 
 		if (files.length === 0) {
-			toast.error('Vous devez sélectionner au moins une image ou vidéo');
+			toast.error('Vous devez sélectionner au moins une ressource');
 			return;
 		}
 
 		// Enlève les images déjà ajoutées
-		files = files.filter((file) => !images.some((img) => img.name === file.name));
+		files = files.filter((file) => !resources.some((img) => img.name === file.name));
 
 		if (files.length === 0) {
-			toast.error('Vous avez déjà ajouté ces images ou vidéos');
+			toast.error('Vous avez déjà ajouté ces ressources');
 			return;
 		}
 
-		if (images.length === 0) {
+		if (resources.length === 0) {
 			mainImage = files[0];
 		}
 
-		images = [...images, ...files];
+		resources = [...resources, ...files];
 
-		toast.success(`${files.length} image(s) ou vidéo(s) importée(s)`);
+		toast.success(`${files.length} ressource(s) importée(s)`);
 	}
 
-	function removeImage(image: File): any {
-		images = images.filter((img) => img !== image);
+	function removeResource(image: File): any {
+		resources = resources.filter((img) => img !== image);
 	}
 
 	function removeFile(fichier: File) {
 		fichiers = fichiers.filter((file) => file !== fichier);
 	}
 
-	function sendProject() {}
+	async function sendProject() {
+		// Vérifie qu'il y ai au moins une ressource sélectionnée
+		if (resources.length === 0) {
+			toast.error('Vous devez sélectionner au moins une image, vidéo ou audio.');
+			return;
+		}
+
+		// Envoie à l'API les projets
+		const formData = new FormData();
+
+		for (const file of [...fichiers, ...resources]) {
+			formData.append('resources', file);
+		}
+
+		try {
+			const response = await fetch('/api/send-project', {
+				method: 'POST',
+				body: formData
+			});
+
+			if (response.ok) {
+				console.log('Files uploaded successfully');
+			} else {
+				console.error('Failed to upload files');
+			}
+		} catch (error) {
+			console.error('Error during file upload:', error);
+		}
+	}
 </script>
 
 <div class="flex justify-center">
@@ -107,7 +145,7 @@
 
 		<p class="mt-4">Merci de remplir ce formulaire afin de publier votre projet pour le Téléthon</p>
 
-		<form class="mt-4 flex flex-col">
+		<form class="mt-4 flex flex-col" on:submit={sendProject}>
 			<p class="text-base">Élève(s) concerné(s) :</p>
 			<div
 				class="border border-gray-400 p-2 w-full rounded-lg mt-2 bg-[#F5F7F8] flex flex-col gap-y-1.5"
@@ -119,14 +157,16 @@
 							class="w-2/5 px-1 outline-gray-200 py-2 border border-[#B5CB99]"
 							placeholder="Prénom"
 							bind:value={eleve.prenom}
+							required
 						/>
 						<input
 							type="text"
 							class="w-2/5 px-1 outline-gray-200 py-2 border border-[#B5CB99]"
 							placeholder="Nom"
 							bind:value={eleve.nom}
+							required
 						/>
-						<select class="py-2 px-1 w-1/5 border border-[#B5CB99] outline-gray-200">
+						<select class="py-2 px-1 w-1/5 border border-[#B5CB99] outline-gray-200" required>
 							{#each classes as classe}
 								<option>{classe.niveau[0] + classe.nombre}</option>
 							{/each}
@@ -134,7 +174,7 @@
 
 						<!-- Enlève la possibilité d'enlever un élève si c'est le dernier car il en faut 1 au minimum -->
 						{#if eleves.length > 1}
-							<button class="w-6 h-6" on:click={() => removeStudent(eleve)}>
+							<button class="w-6 h-6" type="button" on:click={() => removeStudent(eleve)}>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									fill="none"
@@ -180,6 +220,7 @@
 					type="text"
 					class="mt-2 w-full px-1 outline-gray-200 py-2 border border-[#B5CB99]"
 					placeholder="Espoir pour le Téléthon"
+					required
 				/>
 			</div>
 
@@ -192,37 +233,49 @@
 			</div>
 
 			<div class="mt-2.5 border border-gray-400 p-2 rounded-lg bg-[#F5F7F8]">
-				<p class="text-base">Joindre des images et/ou des vidéos du projet :</p>
+				<p class="text-base">Joindre des images, vidéos ou audio du projet :</p>
 				<div class="flex flex-row">
-					<button class="relative bg-lime-300 px-3 py-1 border border-lime-500 mt-2">
+					<button type="button" class="relative bg-lime-300 px-3 py-1 border border-lime-500 mt-2">
 						<input
 							type="file"
 							class="outline-gray-200 border border-[#B5CB99] absolute opacity-0 inset-0 cursor-pointer"
 							multiple
 							on:change={imagesUploaded}
+							required
+							accept=".jpg, .jpeg, .png, .webp, .mp4, .mp3, .gif, .avi, .webm, .mov, .flv, .ogg, .aac, .wav, .m4a"
 						/>
 						Ajouter des images
 					</button>
 
 					<small class="ml-auto italic">
-						{images.length > 0 ? "Cliquez sur une image pour en faire l'image de couverture" : ''}
+						{resources.length > 0
+							? "Cliquez sur une image pour en faire l'image de couverture"
+							: ''}
 					</small>
 				</div>
-				<div class="grid grid-cols-6 gap-2 mt-2">
-					{#each images as image}
+				<div class="grid grid-cols-4 gap-2 mt-2">
+					{#each resources as image}
 						<div class="relative max-h-56">
 							<button
+								type="button"
 								on:click={() => {
 									mainImage = image;
 								}}
 								class="flex justify-center items-center"
 							>
-								<img src={URL.createObjectURL(image)} alt={image.name} class="object-cover" />
+								{#if image.type.startsWith('image/')}
+									<img src={URL.createObjectURL(image)} alt={image.name} class="object-cover" />
+								{:else}
+									<video controls src={URL.createObjectURL(image)} class="w-full h-full">
+										<track kind="captions" class="object-cover" lang="fr" />
+									</video>
+								{/if}
 							</button>
 
 							<button
+								type="button"
 								class="w-10 h-10 absolute bottom-2 right-2 bg-yellow-200 rounded-full flex justify-center items-center"
-								on:click={() => removeImage(image)}
+								on:click={() => removeResource(image)}
 							>
 								<img src={DeleteIcon} alt="Supprimer" class="w-6 h-6" />
 							</button>
@@ -242,7 +295,7 @@
 
 			<div class="mt-2.5 border border-gray-400 p-2 rounded-lg bg-[#F5F7F8]">
 				<p class="text-base">Joindre des fichiers annexes :</p>
-				<button class="relative bg-lime-300 px-3 py-1 border border-lime-500 mt-2">
+				<button type="button" class="relative bg-lime-300 px-3 py-1 border border-lime-500 mt-2">
 					<input
 						type="file"
 						class="outline-gray-200 border border-[#B5CB99] absolute opacity-0 inset-0 cursor-pointer"
@@ -258,7 +311,7 @@
 							class="relative flex flex-row bg-yellow-100 rounded-lg p-2 border border-yellow-300"
 						>
 							<p>{fichier.name}</p>
-							<button class="ml-auto" on:click={() => removeFile(fichier)}>
+							<button type="button" class="ml-auto" on:click={() => removeFile(fichier)}>
 								<img src={DeleteIcon} alt="Supprimer" class="w-6 h-6" />
 							</button>
 						</div>
@@ -267,17 +320,18 @@
 			</div>
 
 			<label>
-				<input type="checkbox" class="mt-5" />
+				<input type="checkbox" class="mt-5" required />
 				Je sais que je ne pourrais pas modifier mon projet après l'avoir envoyé
 			</label>
 			<label>
-				<input type="checkbox" class="mt-2" />
+				<input type="checkbox" class="mt-2" required />
 				Je sais que le projet sera d'abord envoyé à un modérateur avant d'être publié
 			</label>
 
 			<button
-				class="mt-5 px-3 py-1.5 bg-green-300 border-2 border-green-700 w-8/12 self-center rounded-lg"
-				on:click={sendProject}>Envoyer votre projet !</button
+				type="submit"
+				class="mt-5 px-3 py-1.5 bg-green-300 border-2 border-green-700 w-8/12 self-center rounded-lg hover:bg-green-500 duration-150"
+				>Envoyer votre projet !</button
 			>
 		</form>
 	</div>
