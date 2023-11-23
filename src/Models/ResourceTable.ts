@@ -8,9 +8,9 @@ import {
 
 import { Attribute, PrimaryKey, AutoIncrement, NotNull } from '@sequelize/core/decorators-legacy';
 
-export default class FileTable extends Model<
-	InferAttributes<FileTable>,
-	InferCreationAttributes<FileTable>
+export default class ResourceTable extends Model<
+	InferAttributes<ResourceTable>,
+	InferCreationAttributes<ResourceTable>
 > {
 	@Attribute(DataTypes.INTEGER)
 	@PrimaryKey

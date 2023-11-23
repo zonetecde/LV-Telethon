@@ -1,4 +1,4 @@
-export default class File {
+export default class Resource {
 	id: number | undefined;
 	projectId: number;
 	nomFichier: string;

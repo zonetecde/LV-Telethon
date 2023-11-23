@@ -5,12 +5,15 @@
 	import EyeIcon from '../../assets/eye.svg';
 	import Student from '../../Models/Student.js';
 	import Classe from '../../Models/Classe.js';
+	import Resource from '../../Models/Resource.js';
 
-	let eleves: Student[] = [new Student('', '', '')];
+	let eleves: Student[] = [new Student('', '', 'S1')];
 	let classes: Classe[] = [];
 	let resources: File[] = [];
 	let mainImage: File | null = null;
 	let fichiers: File[] = [];
+	let projectName: string = '';
+	let description: string = '';
 
 	onMount(() => {
 		// Ajout des classes
@@ -119,8 +122,24 @@
 		const formData = new FormData();
 
 		for (const file of [...fichiers, ...resources]) {
+			// Envoie sép
+			const type = file.type.startsWith('image/')
+				? 'image'
+				: file.type.startsWith('video/')
+				? 'video'
+				: file.type.startsWith('audio/')
+				? 'audio'
+				: 'file';
+
+			var fichier = new Resource(-1, file.name, '', mainImage === file, type as any);
 			formData.append('resources', file);
+			formData.append('resourcesData', JSON.stringify(fichier));
 		}
+
+		formData.append('projectName', projectName);
+		formData.append('projectDescription', description);
+
+		formData.append('students', JSON.stringify(eleves));
 
 		try {
 			const response = await fetch('/api/send-project', {
@@ -166,7 +185,11 @@
 							bind:value={eleve.nom}
 							required
 						/>
-						<select class="py-2 px-1 w-1/5 border border-[#B5CB99] outline-gray-200" required>
+						<select
+							class="py-2 px-1 w-1/5 border border-[#B5CB99] outline-gray-200"
+							required
+							bind:value={eleve.classe}
+						>
 							{#each classes as classe}
 								<option>{classe.niveau[0] + classe.nombre}</option>
 							{/each}
@@ -217,6 +240,7 @@
 			<div class="mt-2.5 border border-gray-400 p-2 rounded-lg bg-[#F5F7F8]">
 				<p class="text-base">Nom du projet :</p>
 				<input
+					bind:value={projectName}
 					type="text"
 					class="mt-2 w-full px-1 outline-gray-200 py-2 border border-[#B5CB99]"
 					placeholder="Espoir pour le Téléthon"
@@ -227,6 +251,7 @@
 			<div class="mt-2.5 border border-gray-400 p-2 rounded-lg bg-[#F5F7F8]">
 				<p class="text-base">Description du projet :</p>
 				<textarea
+					bind:value={description}
 					class="mt-2 w-full px-1 outline-gray-200 py-2 border border-[#B5CB99]"
 					placeholder="Expliquer les raisons de votre choix, ses objectifs, etc."
 				/>
@@ -241,21 +266,24 @@
 							class="outline-gray-200 border border-[#B5CB99] absolute opacity-0 inset-0 cursor-pointer"
 							multiple
 							on:change={imagesUploaded}
-							required
 							accept=".jpg, .jpeg, .png, .webp, .mp4, .mp3, .gif, .avi, .webm, .mov, .flv, .ogg, .aac, .wav, .m4a"
 						/>
 						Ajouter des images
 					</button>
 
-					<small class="ml-auto italic">
+					<p class="ml-auto md:mr-3 italic text-sm">
 						{resources.length > 0
 							? "Cliquez sur une image pour en faire l'image de couverture"
 							: ''}
-					</small>
+					</p>
 				</div>
-				<div class="grid grid-cols-4 gap-2 mt-2">
+				<div
+					class="grid md:grid-cols-4 grid-cols-3 xl:grid-cols-6 gap-2 mt-2 overflow-y-auto auto-rows-fr"
+				>
 					{#each resources as image}
-						<div class="relative max-h-56">
+						<div
+							class="relative border-2 border-orange-700 bg-orange-50 overflow-none flex items-center justify-center"
+						>
 							<button
 								type="button"
 								on:click={() => {
@@ -264,9 +292,14 @@
 								class="flex justify-center items-center"
 							>
 								{#if image.type.startsWith('image/')}
-									<img src={URL.createObjectURL(image)} alt={image.name} class="object-cover" />
+									<img src={URL.createObjectURL(image)} alt={image.name} class="object-contain" />
 								{:else}
-									<video controls src={URL.createObjectURL(image)} class="w-full h-full">
+									<!-- Audio ou vidéo -->
+									<video
+										controls
+										src={URL.createObjectURL(image)}
+										class="w-full h-full object-contain max-h-[200px]"
+									>
 										<track kind="captions" class="object-cover" lang="fr" />
 									</video>
 								{/if}

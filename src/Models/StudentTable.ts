@@ -17,15 +17,15 @@ export default class StudentTable extends Model<
 	@AutoIncrement
 	declare id: CreationOptional<number>;
 
-	@Attribute(DataTypes.INTEGER)
+	@Attribute(DataTypes.STRING)
 	@NotNull
 	declare nom: string;
 
-	@Attribute(DataTypes.INTEGER)
+	@Attribute(DataTypes.STRING)
 	@NotNull
 	declare prenom: string;
 
-	@Attribute(DataTypes.INTEGER)
+	@Attribute(DataTypes.STRING)
 	@NotNull
 	declare classe: string;
 

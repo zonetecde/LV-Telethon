@@ -8,13 +8,13 @@
 <Toaster />
 
 <div
-	class="w-screen h-20 bg-[#F5F300] header-bg flex justify-center items-center border-b-2 border-yellow-200 relative"
+	class="w-screen h-20 bg-[#F5F300] header-bg flex md:justify-center items-center border-b-2 border-yellow-200 relative z-50"
 >
-	<img src={TelethonLogo} class="w-20 h-20" alt="Logo du Téléthon" />
-	<h1 class="text-3xl font-bold">LV Téléthon</h1>
+	<img src={TelethonLogo} class="ml-1 md:ml-0 md:w-20 md:h-20 w-10 h-10" alt="Logo du Téléthon" />
+	<h1 class="text-xl md:text-3xl font-bold">LV Téléthon</h1>
 
 	<a
-		class="absolute right-5 py-3 px-5 rounded-xl bg-[#F3B664] border-2 border-[#EC8F5E] shadow-md shadow-orange-800 text-md hover:scale-105 duration-150 hover:shadow-lg"
+		class="absolute right-2 md:right-5 py-1 md:py-3 px-2 md:px-5 rounded-xl bg-[#F3B664] border md:border-2 border-[#EC8F5E] shadow-md shadow-orange-800 text-md md:hover:scale-105 duration-150 md:hover:shadow-lg"
 		href="/deposer-son-projet">Déposer un projet</a
 	>
 </div>
