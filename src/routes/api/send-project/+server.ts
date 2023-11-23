@@ -4,9 +4,23 @@ import type Student from '../../../Models/Student.js';
 import ProjectTable from '../../../Models/ProjectTable.js';
 import ResourceTable from '../../../Models/ResourceTable.js';
 import StudentTable from '../../../Models/StudentTable.js';
+import { dbConnection } from '../database/db.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST(request) {
+	if (!ProjectTable.isInitialized()) {
+		console.log('Initializing project table...');
+		dbConnection.addModels([ProjectTable]);
+	}
+	if (!ResourceTable.isInitialized()) {
+		console.log('Initializing resource table...');
+		dbConnection.addModels([ResourceTable]);
+	}
+	if (!StudentTable.isInitialized()) {
+		console.log('Initializing student table...');
+		dbConnection.addModels([StudentTable]);
+	}
+
 	const formData = await request.request.formData();
 
 	// Ajoute le projet à la base de données

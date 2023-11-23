@@ -40,7 +40,7 @@ export default class ResourceTable extends Model<
 
 	@Attribute(DataTypes.STRING)
 	@NotNull
-	declare Type: 'video' | 'audio' | 'image' | 'other';
+	declare Type: string;
 
 	@Attribute(DataTypes.BOOLEAN)
 	@NotNull
