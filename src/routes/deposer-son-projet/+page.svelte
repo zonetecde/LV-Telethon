@@ -163,9 +163,9 @@
 				window.location.href = '/merci';
 			} else {
 				toast.error(
-					"Une erreur est survenue lors de l'envoi du projet. Veuillez réessayer plus tard."
+					"Une erreur est survenue lors de l'envoi du projet. Veuillez réessayer plus tard.\n\nErreur :" +
+						(await response.text())
 				);
-				console.log(await response.text());
 			}
 		} catch (error) {
 			console.error('Error during file upload:', error);

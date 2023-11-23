@@ -14,9 +14,9 @@ export async function POST(request) {
 
 	// Ajoute le projet à la base de données
 	const projectName = formData.get('projectName');
-	const projectDescription = formData.get('projectDescription');
+	const projectDescription = formData.get('projectDescription') ?? '';
 
-	if (!projectName || !projectDescription) {
+	if (!projectName) {
 		return new Response(JSON.stringify('Nom de projet ou description manquante.'), { status: 400 });
 	}
 
