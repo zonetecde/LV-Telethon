@@ -165,6 +165,7 @@
 				toast.error(
 					"Une erreur est survenue lors de l'envoi du projet. Veuillez réessayer plus tard."
 				);
+				console.log(await response.text());
 			}
 		} catch (error) {
 			console.error('Error during file upload:', error);

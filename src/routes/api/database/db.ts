@@ -5,10 +5,6 @@ import StudentTable from '../../../Models/StudentTable.js';
 
 const dbConnection = new Sequelize('sqlite:./database/database.db');
 
-dbConnection.sync().then(() => {
-	console.log('Initialized');
-});
-
 process.on('exit', () => {
 	console.log('Closing database connection...');
 	dbConnection.close();

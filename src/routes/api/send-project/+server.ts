@@ -8,18 +8,7 @@ import { dbConnection } from '../database/db.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST(request) {
-	if (!ProjectTable.isInitialized()) {
-		console.log('Initializing project table...');
-		dbConnection.addModels([ProjectTable]);
-	}
-	if (!ResourceTable.isInitialized()) {
-		console.log('Initializing resource table...');
-		dbConnection.addModels([ResourceTable]);
-	}
-	if (!StudentTable.isInitialized()) {
-		console.log('Initializing student table...');
-		dbConnection.addModels([StudentTable]);
-	}
+	initDb();
 
 	const formData = await request.request.formData();
 
@@ -107,4 +96,22 @@ export async function POST(request) {
 	);
 
 	return new Response(JSON.stringify('Success'));
+}
+function initDb() {
+	if (!ProjectTable.isInitialized()) {
+		console.log('Initializing project table...');
+		dbConnection.addModels([ProjectTable]);
+	}
+	if (!ResourceTable.isInitialized()) {
+		console.log('Initializing resource table...');
+		dbConnection.addModels([ResourceTable]);
+	}
+	if (!StudentTable.isInitialized()) {
+		console.log('Initializing student table...');
+		dbConnection.addModels([StudentTable]);
+	}
+
+	dbConnection.sync().then(() => {
+		console.log('Initialized');
+	});
 }
