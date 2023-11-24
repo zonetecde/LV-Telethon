@@ -8,95 +8,110 @@ import { dbConnection } from '../database/db.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST(request) {
-	initDb();
+	// Write log on log.txt
+	try {
+		const log = `POST ${request.url} ${Date.now()}}\n`;
+		fs.appendFile('./log.txt', log, function (err) {
+			if (err) {
+				console.log(err);
+			}
+		});
 
-	const formData = await request.request.formData();
+		initDb();
 
-	// Ajoute le projet à la base de données
-	const projectName = formData.get('projectName');
-	const projectDescription = formData.get('projectDescription') ?? '';
+		const formData = await request.request.formData();
 
-	if (!projectName) {
-		return new Response(JSON.stringify('Nom de projet ou description manquante.'), { status: 400 });
-	}
+		// Ajoute le projet à la base de données
+		const projectName = formData.get('projectName');
+		const projectDescription = formData.get('projectDescription') ?? '';
 
-	const hideOurNames = JSON.parse(formData.getAll('hideOurNames').toString());
+		if (!projectName) {
+			return new Response(JSON.stringify('Nom de projet ou description manquante.'), {
+				status: 400
+			});
+		}
 
-	const projectId = (
-		await ProjectTable.create({
-			projectName: projectName.toString(),
-			projectDescription: projectDescription.toString(),
-			hideStudentsNames: hideOurNames
-		})
-	).getDataValue('id');
+		const hideOurNames = JSON.parse(formData.getAll('hideOurNames').toString());
 
-	// Ajoute les ressources à la base de données et les télécharge
+		const projectId = (
+			await ProjectTable.create({
+				projectName: projectName.toString(),
+				projectDescription: projectDescription.toString(),
+				hideStudentsNames: hideOurNames
+			})
+		).getDataValue('id');
 
-	// Contient les fichiers envoyés par l'utilisateur
-	const resources = formData.getAll('resources');
+		// Ajoute les ressources à la base de données et les télécharge
 
-	// Contient les données des fichiers envoyés par l'utilisateur
-	// (type, nom de fichier, isMain, etc.)
-	const resourcesData: Resource[] = formData
-		.getAll('resourcesData')
-		.map((f) => JSON.parse(f.toString()));
+		// Contient les fichiers envoyés par l'utilisateur
+		const resources = formData.getAll('resources');
 
-	if (!resources || !resourcesData) {
-		return new Response(JSON.stringify('Pas de ressources.'), { status: 400 });
-	}
+		// Contient les données des fichiers envoyés par l'utilisateur
+		// (type, nom de fichier, isMain, etc.)
+		const resourcesData: Resource[] = formData
+			.getAll('resourcesData')
+			.map((f) => JSON.parse(f.toString()));
 
-	await Promise.all(
-		resources.map(async (file) => {
-			if (file instanceof File) {
-				// Nom de fichier unique
-				const fileName = `${Date.now()}` + file.name.match(/\.[0-9a-z]+$/i)![0];
+		if (!resources || !resourcesData) {
+			return new Response(JSON.stringify('Pas de ressources.'), { status: 400 });
+		}
 
-				const path = `./uploaded/${fileName}`;
+		await Promise.all(
+			resources.map(async (file) => {
+				if (file instanceof File) {
+					// Nom de fichier unique
+					const fileName = `${Date.now()}` + file.name.match(/\.[0-9a-z]+$/i)![0];
 
-				// Téléchargement du fichier
-				file.arrayBuffer().then((buffer) => {
-					fs.appendFile(path, Buffer.from(buffer), function (err: any) {
-						if (err) {
-							return new Response(JSON.stringify(err), { status: 400 });
-						}
+					const path = `./uploaded/${fileName}`;
+
+					// Téléchargement du fichier
+					file.arrayBuffer().then((buffer) => {
+						fs.appendFile(path, Buffer.from(buffer), function (err: any) {
+							if (err) {
+								return new Response(JSON.stringify(err), { status: 400 });
+							}
+						});
 					});
-				});
 
-				// Ajout du fichier à la base de données
-				const fileData = resourcesData.find((f) => f.nomFichier === file.name);
-				if (fileData) {
-					const results = await ResourceTable.create({
-						nomFichier: fileData.nomFichier,
-						Path: path,
-						Type: fileData.Type,
-						isMain: fileData.IsMainRessource,
+					// Ajout du fichier à la base de données
+					const fileData = resourcesData.find((f) => f.nomFichier === file.name);
+					if (fileData) {
+						const results = await ResourceTable.create({
+							nomFichier: fileData.nomFichier,
+							Path: path,
+							Type: fileData.Type,
+							isMain: fileData.IsMainRessource,
+							projectId: projectId
+						});
+					}
+				}
+			})
+		);
+
+		// Ajout des élèves à la base de données
+		const students = JSON.parse(formData.getAll('students').toString()) as Student[];
+
+		if (!students) return new Response(JSON.stringify("Pas d'élèves."), { status: 400 });
+
+		await Promise.all(
+			students.map(async (student) => {
+				if (student) {
+					await StudentTable.create({
+						prenom: student.prenom,
+						classe: student.classe,
+						nom: student.nom,
 						projectId: projectId
 					});
 				}
-			}
-		})
-	);
-
-	// Ajout des élèves à la base de données
-	const students = JSON.parse(formData.getAll('students').toString()) as Student[];
-
-	if (!students) return new Response(JSON.stringify("Pas d'élèves."), { status: 400 });
-
-	await Promise.all(
-		students.map(async (student) => {
-			if (student) {
-				await StudentTable.create({
-					prenom: student.prenom,
-					classe: student.classe,
-					nom: student.nom,
-					projectId: projectId
-				});
-			}
-		})
-	);
+			})
+		);
+	} catch (err: any) {
+		return new Response(JSON.stringify(err.message), { status: 400 });
+	}
 
 	return new Response(JSON.stringify('Success'));
 }
+
 function initDb() {
 	if (!ProjectTable.isInitialized()) {
 		console.log('Initializing project table...');
