@@ -4,7 +4,8 @@ import type Student from '../../../Models/Student.js';
 import ProjectTable from '../../../Models/ProjectTable.js';
 import ResourceTable from '../../../Models/ResourceTable.js';
 import StudentTable from '../../../Models/StudentTable.js';
-import { dbConnection } from '../database/db.js';
+import { dbConnection, initDb } from '../database/db.js';
+import ffmpeg from 'ffmpeg';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST(request) {
@@ -65,18 +66,43 @@ export async function POST(request) {
 					const path = `./uploaded/${fileName}`;
 
 					// Téléchargement du fichier
-					file.arrayBuffer().then((buffer) => {
-						fs.appendFile(path, Buffer.from(buffer), function (err: any) {
-							if (err) {
-								return new Response(JSON.stringify(err), { status: 400 });
+					file
+						.arrayBuffer()
+						.then((buffer) => {
+							fs.appendFile(path, Buffer.from(buffer), function (err: any) {
+								if (err) {
+									return new Response(JSON.stringify(err), { status: 400 });
+								}
+							});
+						})
+						.finally(() => {
+							// Si c'est une vidéo, enregiste le thumbnail à la première seconde de la vid
+							if (file.type.startsWith('video')) {
+								try {
+									var process = new ffmpeg(path);
+									process.then(
+										function (video) {
+											video.addCommand('-ss', '00:00:02');
+											video.addCommand('-vframes', '1');
+											video.save(`${path}.jpg`, function (error, file) {
+												if (!error) console.log('Thumbail sauvegardé: ' + file);
+											});
+										},
+										function (err) {
+											console.log('Error: ' + err);
+										}
+									);
+								} catch (e: any) {
+									console.log(e.code);
+									console.log(e.msg);
+								}
 							}
 						});
-					});
 
 					// Ajout du fichier à la base de données
 					const fileData = resourcesData.find((f) => f.nomFichier === file.name);
 					if (fileData) {
-						const results = await ResourceTable.create({
+						await ResourceTable.create({
 							nomFichier: fileData.nomFichier,
 							Path: path,
 							Type: fileData.Type,
@@ -110,23 +136,4 @@ export async function POST(request) {
 	}
 
 	return new Response(JSON.stringify('Success'));
-}
-
-function initDb() {
-	if (!ProjectTable.isInitialized()) {
-		console.log('Initializing project table...');
-		dbConnection.addModels([ProjectTable]);
-	}
-	if (!ResourceTable.isInitialized()) {
-		console.log('Initializing resource table...');
-		dbConnection.addModels([ResourceTable]);
-	}
-	if (!StudentTable.isInitialized()) {
-		console.log('Initializing student table...');
-		dbConnection.addModels([StudentTable]);
-	}
-
-	dbConnection.sync().then(() => {
-		console.log('Initialized');
-	});
 }
