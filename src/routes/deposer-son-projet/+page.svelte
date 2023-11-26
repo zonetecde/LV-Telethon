@@ -329,7 +329,7 @@
 
 							<button
 								type="button"
-								class="w-10 h-10 absolute bottom-2 right-2 bg-yellow-200 rounded-full flex justify-center items-center"
+								class="md:w-10 w-5 h-5 md:h-10 absolute md:bottom-2 bottom-0.5 right-0.5 md:right-2 bg-yellow-200 rounded-full flex justify-center items-center"
 								on:click={() => removeResource(image)}
 							>
 								<img src={DeleteIcon} alt="Supprimer" class="w-6 h-6" />
@@ -337,7 +337,7 @@
 
 							{#if image === mainImage}
 								<div
-									class="w-10 h-10 absolute top-2 left-2 bg-lime-300 rounded-full flex justify-center items-center"
+									class="md:w-10 w-5 h-5 md:h-10 absolute md:top-2 top-0.5 left-0.5 md:left-2 bg-lime-300 rounded-full flex justify-center items-center"
 									title="Image principale"
 								>
 									<img src={EyeIcon} alt="Image principale" class="w-6 h-6" aria-hidden="true" />
