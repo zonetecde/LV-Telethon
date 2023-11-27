@@ -8,7 +8,7 @@
 <Toaster />
 
 <div
-	class="w-screen h-20 bg-[#F5F300] header-bg flex md:justify-center items-center border-b-2 border-yellow-200 relative z-50"
+	class="w-screen h-20 bg-[#F5F300] header-bg flex md:justify-center items-center border-b-2 border-yellow-200 relative z-20"
 >
 	<button
 		on:click={() => (window.location.href = '/')}

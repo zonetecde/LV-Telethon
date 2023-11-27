@@ -9,15 +9,7 @@ import ffmpeg from 'ffmpeg';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST(request) {
-	// Write log on log.txt
 	try {
-		const log = `POST ${request.url} ${Date.now()}}\n`;
-		fs.appendFile('./log.txt', log, function (err) {
-			if (err) {
-				console.log(err);
-			}
-		});
-
 		initDb();
 
 		const formData = await request.request.formData();
