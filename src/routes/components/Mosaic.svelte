@@ -49,16 +49,21 @@
 	<div class="w-full h-full grid grid-cols-32 gap-0 place-content-start">
 		{#each imagesPath as { projectId, imagePaths }}
 			{#each imagePaths as { nomFichier, Type }, i}
-				<!-- Image ou vidéo -->
-				<img
-					src={Type === 'audio'
-						? './src/assets/audio.png'
-						: nomFichier + (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
-					alt={projectId.toString()}
-					class="w-full aspect-square object-fill hover:scale-150 duration-150 hover:z-50 transition-all cursor-pointer"
-					on:mouseenter={handleMouseEnter}
-					on:mouseleave={handleMouseLeave}
-				/>
+				{#if Type === 'video' || Type === 'audio' || Type === 'image' || Type === 'text'}
+					<!-- Image ou vidéo -->
+					<img
+						src={Type === 'audio'
+							? './src/assets/audio.png'
+							: Type === 'text'
+							? './src/assets/text.png'
+							: nomFichier +
+							  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
+						alt={projectId.toString()}
+						class="w-full aspect-square object-fill hover:scale-150 duration-150 hover:z-50 transition-all cursor-pointer"
+						on:mouseenter={handleMouseEnter}
+						on:mouseleave={handleMouseLeave}
+					/>
+				{/if}
 			{/each}
 		{/each}
 	</div>

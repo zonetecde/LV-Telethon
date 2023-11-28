@@ -80,7 +80,8 @@
 			(file) =>
 				file.type.startsWith('image/') ||
 				file.type.startsWith('video/') ||
-				file.type.startsWith('audio/')
+				file.type.startsWith('audio/') ||
+				file.type.startsWith('application/')
 		);
 
 		if (files.length === 0) {
@@ -139,6 +140,8 @@
 				? 'video'
 				: file.type.startsWith('audio/')
 				? 'audio'
+				: file.type.startsWith('application/')
+				? 'text'
 				: 'file';
 
 			var fichier = new Resource(file.name, mainImage === file, type as any);
@@ -280,7 +283,7 @@
 			</div>
 
 			<div class="mt-2.5 border border-gray-400 p-2 rounded-lg bg-[#F5F7F8]">
-				<p class="text-base">Joindre des images, vidéos ou audio du projet :</p>
+				<p class="text-base">Joindre des images, vidéos, audio ou document texte du projet :</p>
 				<div class="flex flex-row">
 					<button type="button" class="relative bg-lime-300 px-3 py-1 border border-lime-500 mt-2">
 						<input
@@ -288,7 +291,7 @@
 							class="outline-gray-200 border border-[#B5CB99] absolute opacity-0 inset-0 cursor-pointer"
 							multiple
 							on:change={imagesUploaded}
-							accept=".jpg, .jpeg, .png, .webp, .mp4, .mp3, .gif, .avi, .webm, .mov, .flv, .ogg, .aac, .wav, .m4a"
+							accept=".jpg, .jpeg, .png, .webp, .mp4, .mp3, .gif, .avi, .webm, .mov, .flv, .ogg, .aac, .wav, .m4a, .odt, .pdf, .txt, .doc, .docx"
 						/>
 						Ajouter des images
 					</button>
@@ -315,7 +318,7 @@
 							>
 								{#if image.type.startsWith('image/')}
 									<img src={URL.createObjectURL(image)} alt={image.name} class="object-contain" />
-								{:else}
+								{:else if image.type.startsWith('video/')}
 									<!-- Audio ou vidéo -->
 									<video
 										controls
@@ -324,6 +327,13 @@
 									>
 										<track kind="captions" class="object-cover" lang="fr" />
 									</video>
+								{:else}
+									<div
+										class="flex flex-col items-center justify-center w-14 h-18 my-6 px-0.5 md:px-3 overflow-hidden"
+									>
+										<img src="text.png" alt={image.name} class="object-contain w-8 h-8 my-4" />
+										<p class="mb-3 flex-wrap w-full">{image.name}</p>
+									</div>
 								{/if}
 							</button>
 

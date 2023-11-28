@@ -6,13 +6,13 @@
  */
 export default class Resource {
 	nomFichier: string;
-	Type: 'video' | 'audio' | 'image' | 'other';
+	Type: 'video' | 'audio' | 'image' | 'text' | 'other';
 	IsMainRessource: boolean;
 
 	constructor(
 		nomFichier: string,
 		isMainRessource: boolean,
-		type: 'video' | 'audio' | 'image' | 'other'
+		type: 'video' | 'audio' | 'image' | 'text' | 'other'
 	) {
 		this.nomFichier = nomFichier;
 		this.IsMainRessource = isMainRessource;
