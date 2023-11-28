@@ -66,19 +66,21 @@
 	<div class="w-full h-full grid grid-cols gap-0 place-content-start">
 		{#each imagesPath as { projectId, imagePaths }}
 			{#each imagePaths as { nomFichier, Type }, i}
-				<img
-					src={Type === 'audio'
-						? './src/assets/audio.png'
-						: Type === 'text'
-						? 'text.png'
-						: (!isUnderDev ? 'https://lv-telethon.fr/static' : '') + // pour servire les images en static
-						  nomFichier.replace('./uploaded', '/uploaded') +
-						  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
-					alt={projectId.toString()}
-					class="w-full aspect-square object-fill hover:scale-150 duration-150 hover:z-50 transition-all cursor-pointer projectInfo"
-					on:mouseenter={handleMouseEnter}
-					on:mouseleave={handleMouseLeave}
-				/>
+				{#if Type !== 'other'}
+					<img
+						src={Type === 'audio'
+							? './src/assets/audio.png'
+							: Type === 'text'
+							? 'text.png'
+							: (!isUnderDev ? 'https://lv-telethon.fr/static' : '') + // pour servire les images en static
+							  nomFichier.replace('./uploaded', '/uploaded') +
+							  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
+						alt={projectId.toString()}
+						class="w-full aspect-square object-fill hover:scale-150 duration-150 hover:z-50 transition-all cursor-pointer projectInfo"
+						on:mouseenter={handleMouseEnter}
+						on:mouseleave={handleMouseLeave}
+					/>
+				{/if}
 			{/each}
 		{/each}
 	</div>
