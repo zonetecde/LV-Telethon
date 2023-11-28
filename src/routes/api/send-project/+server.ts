@@ -55,7 +55,7 @@ export async function POST(request) {
 					// Nom de fichier unique
 					const fileName = `${Date.now()}` + file.name.match(/\.[0-9a-z]+$/i)![0];
 
-					const path = `./uploaded/${fileName}`;
+					const path = `./static/uploaded/${fileName}`;
 
 					// Téléchargement du fichier
 					file
@@ -67,26 +67,42 @@ export async function POST(request) {
 								}
 							});
 						})
-						.finally(() => {
+						.then(async () => {
 							// Si c'est une vidéo, enregiste le thumbnail à la première seconde de la vid
 							if (file.type.startsWith('video')) {
 								try {
-									var process = new ffmpeg(path);
-									process.then(
-										function (video) {
-											video.addCommand('-ss', '00:00:02');
-											video.addCommand('-vframes', '1');
-											video.save(`${path}.jpg`, function (error, file) {
-												if (!error) console.log('Thumbail sauvegardé: ' + file);
-											});
-										},
-										function (err) {
-											console.log('Error: ' + err);
-										}
-									);
+									await new Promise((resolve) => setTimeout(resolve, 500));
+
+									await new Promise((resolve, reject): any => {
+										var process = new ffmpeg(path);
+
+										process.then(
+											function (video) {
+												video.addCommand('-ss', '00:00:02');
+												video.addCommand('-vframes', '1');
+												video.save(`${path}.jpg`, function (error, file) {
+													if (!error) {
+														console.log('Thumbail sauvegardé: ' + file);
+														resolve(0);
+													} else {
+														console.log(error);
+														reject(error);
+													}
+												});
+											},
+											function (err) {
+												console.log('Error: ' + err);
+												reject(err);
+											}
+										);
+									});
 								} catch (e: any) {
+									console.log(e);
 									console.log(e.code);
 									console.log(e.msg);
+									console.log(path);
+									console.log(await fs.existsSync(path));
+									console.log(await fs.existsSync(path));
 								}
 							}
 						});
@@ -96,7 +112,7 @@ export async function POST(request) {
 					if (fileData) {
 						await ResourceTable.create({
 							nomFichier: fileData.nomFichier,
-							Path: path,
+							Path: path.replaceAll('static/', ''),
 							Type: fileData.Type,
 							isMain: fileData.IsMainRessource,
 							projectId: projectId
