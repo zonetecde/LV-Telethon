@@ -69,6 +69,8 @@
 				<img
 					src={Type === 'audio'
 						? './src/assets/audio.png'
+						: Type === 'text'
+						? 'text.png'
 						: (!isUnderDev ? 'https://lv-telethon.fr/static' : '') + // pour servire les images en static
 						  nomFichier.replace('./uploaded', '/uploaded') +
 						  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
