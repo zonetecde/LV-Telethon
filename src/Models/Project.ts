@@ -7,7 +7,7 @@ import type Student from './Student.js';
 export default class Project {
 	projectName: string;
 	projectDescription: string;
-	sudents: Student[];
+	students: Student[];
 	resources: Resource[];
 
 	constructor(
@@ -18,7 +18,7 @@ export default class Project {
 	) {
 		this.projectName = projectName;
 		this.projectDescription = projectDescription;
-		this.sudents = students;
+		this.students = students;
 		this.resources = resources;
 	}
 }

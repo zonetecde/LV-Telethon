@@ -14,7 +14,13 @@
 		imagePaths: Resource[];
 	}[] = [];
 
+	let isUnderDev = false;
 	onMount(async () => {
+		var currentUrl = window.location.href;
+		if (currentUrl.includes('localhost')) {
+			isUnderDev = true;
+		}
+
 		const response = await fetch('/api/get-images');
 
 		imagesPath = await response.json();
@@ -30,40 +36,47 @@
 
 		setTimeout(() => {
 			if (hoveredElement === target) {
+				const INFORMATION_WIDTH = 700;
 				// Place la fenêtre d'information au centre bas de l'image
-				offsetX = `${target.offsetLeft - 322 / 2}px`;
-				offsetY = `${target.offsetTop + target.offsetHeight / 2 + 25}px`;
+				offsetX = `${target.offsetLeft - INFORMATION_WIDTH / 2}px`;
+				offsetY = `${target.offsetTop + target.offsetHeight / 2 - 20}px`;
+
+				// Si on est sur les bords de l'écran, on décale la fenêtre d'information
+				if (target.offsetLeft < INFORMATION_WIDTH / 2) {
+					offsetX = `${target.offsetLeft}px`;
+				} else if (target.offsetLeft + INFORMATION_WIDTH / 2 > window.innerWidth) {
+					offsetX = `${window.innerWidth - INFORMATION_WIDTH}px`;
+				}
+
 				projectId = parseInt(target.alt);
 				hoveredElementToShow = target;
 			}
 		}, 750);
 	}
 
-	function handleMouseLeave() {
-		hoveredElementToShow = null;
-		hoveredElement = null;
+	function handleMouseLeave(event: MouseEvent & { currentTarget: EventTarget & HTMLImageElement }) {
+		if (event.currentTarget.classList.contains('projectInfo') === false) {
+			hoveredElementToShow = null;
+			hoveredElement = null;
+		}
 	}
 </script>
 
 <div class="bg-white w-full h-full">
-	<div class="w-full h-full grid grid-cols-32 gap-0 place-content-start">
+	<div class="w-full h-full grid grid-cols gap-0 place-content-start">
 		{#each imagesPath as { projectId, imagePaths }}
 			{#each imagePaths as { nomFichier, Type }, i}
-				{#if Type === 'video' || Type === 'audio' || Type === 'image' || Type === 'text'}
-					<!-- Image ou vidéo -->
-					<img
-						src={Type === 'audio'
-							? './src/assets/audio.png'
-							: Type === 'text'
-							? './src/assets/text.png'
-							: nomFichier +
-							  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
-						alt={projectId.toString()}
-						class="w-full aspect-square object-fill hover:scale-150 duration-150 hover:z-50 transition-all cursor-pointer"
-						on:mouseenter={handleMouseEnter}
-						on:mouseleave={handleMouseLeave}
-					/>
-				{/if}
+				<img
+					src={Type === 'audio'
+						? './src/assets/audio.png'
+						: (!isUnderDev ? 'https://lv-telethon.fr/static' : '') + // pour servire les images en static
+						  nomFichier.replace('./uploaded', '/uploaded') +
+						  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
+					alt={projectId.toString()}
+					class="w-full aspect-square object-fill hover:scale-150 duration-150 hover:z-50 transition-all cursor-pointer projectInfo"
+					on:mouseenter={handleMouseEnter}
+					on:mouseleave={handleMouseLeave}
+				/>
 			{/each}
 		{/each}
 	</div>
@@ -71,18 +84,32 @@
 	<img
 		src={Telethon}
 		alt=""
-		class="absolute z-50 w-11/12 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+		class="absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-80"
 	/>
 </div>
 
 {#if hoveredElementToShow}
-	<div class="absolute z-50" style="left: {offsetX}; top: {offsetY}">
-		<ProjectInfo {projectId} />
+	<div class="md:absolute block w-full z-50" style="left: {offsetX}; top: {offsetY}">
+		<ProjectInfo
+			{projectId}
+			on:mouseleave={() => {
+				hoveredElementToShow = null;
+				hoveredElement = null;
+			}}
+		/>
 	</div>
 {/if}
 
 <style>
-	.grid-cols-32 {
-		grid-template-columns: repeat(32, minmax(0, 1fr));
+	@media (min-width: 640px) {
+		.grid-cols {
+			grid-template-columns: repeat(25, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 639px) {
+		.grid-cols {
+			grid-template-columns: repeat(12, minmax(0, 1fr));
+		}
 	}
 </style>
