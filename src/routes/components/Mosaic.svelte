@@ -35,7 +35,11 @@
 		hoveredElement = target;
 
 		setTimeout(() => {
-			if (hoveredElement === target) {
+			const onPhone = window.innerWidth < 640; // Un simple clique suffit alors à afficher les informations
+			if (hoveredElement === target || onPhone) {
+				projectId = parseInt(target.alt);
+				hoveredElementToShow = target;
+
 				const INFORMATION_WIDTH = 700;
 				// Place la fenêtre d'information au centre bas de l'image
 				offsetX = `${target.offsetLeft - INFORMATION_WIDTH / 2}px`;
@@ -47,14 +51,11 @@
 				} else if (target.offsetLeft + INFORMATION_WIDTH / 2 > window.innerWidth) {
 					offsetX = `${window.innerWidth - INFORMATION_WIDTH}px`;
 				}
-
-				projectId = parseInt(target.alt);
-				hoveredElementToShow = target;
 			}
 		}, 750);
 	}
 
-	function handleMouseLeave(event: MouseEvent & { currentTarget: EventTarget & HTMLImageElement }) {
+	function handleMouseLeave(event: any) {
 		if (event.currentTarget.classList.contains('projectInfo') === false) {
 			hoveredElementToShow = null;
 			hoveredElement = null;
@@ -62,7 +63,8 @@
 	}
 </script>
 
-<div class="bg-white w-full h-full">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="bg-white w-full h-full" on:mouseenter={handleMouseLeave}>
 	<div class="w-full h-full grid grid-cols gap-0 place-content-start">
 		{#each imagesPath as { projectId, imagePaths }}
 			{#each imagePaths as { nomFichier, Type }, i}

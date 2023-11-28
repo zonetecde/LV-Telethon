@@ -9,16 +9,28 @@
 
 	let isUnderDev = false;
 
+	let mounted = false;
 	onMount(async () => {
 		var currentUrl = window.location.href;
 		if (currentUrl.includes('localhost')) {
 			isUnderDev = true;
 		}
 
+		mounted = true;
+
 		const response = await fetch('/api/get-project?projectId=' + projectId);
 
 		project = await response.json();
 	});
+
+	$: {
+		projectId;
+		if (mounted) {
+			fetch('/api/get-project?projectId=' + projectId).then(
+				async (response) => (project = await response.json())
+			);
+		}
+	}
 
 	const dispatcher = createEventDispatcher();
 	function handleMouseLeave(event: MouseEvent) {
@@ -42,7 +54,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="w-full md:w-[700px] h-80 bg-white rounded-xl border-2 border-black flex flex-col px-3 pt-3 overflow-y-auto projectInfo"
+	class="w-full md:w-[700px] h-80 bg-white rounded-xl border-t-2 md:border-2 border-black flex flex-col px-3 pt-3 overflow-y-auto projectInfo"
 	on:mouseleave={handleMouseLeave}
 >
 	{#if project}
@@ -54,7 +66,7 @@
 		{/if}
 
 		<!-- Les images -->
-		{#if project.resources.length > 0}
+		{#if project.resources}
 			<h3 class="font-bold mt-3 text-left">Images du projet :</h3>
 			<div class="flex flex-col flex-wrap justify-center">
 				{#each project.resources as resource}
@@ -89,7 +101,7 @@
 			</div>
 		{/if}
 
-		{#if project.students.length > 0}
+		{#if project.students}
 			<p class="text-left font-bold">
 				De :
 				{#each project.students as student, i}
