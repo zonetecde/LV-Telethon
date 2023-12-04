@@ -62,8 +62,12 @@ export async function POST(request) {
 						.arrayBuffer()
 						.then((buffer) => {
 							fs.appendFile(path, Buffer.from(buffer), function (err: any) {
+								console.log('File saved: ' + path);
+
 								if (err) {
+									console.log(err);
 									return new Response(JSON.stringify(err), { status: 400 });
+								} else {
 								}
 							});
 						})
@@ -71,7 +75,7 @@ export async function POST(request) {
 							// Si c'est une vidéo, enregiste le thumbnail à la première seconde de la vid
 							if (file.type.startsWith('video')) {
 								try {
-									await new Promise((resolve) => setTimeout(resolve, 500));
+									await new Promise((resolve) => setTimeout(resolve, 2500));
 
 									await new Promise((resolve, reject): any => {
 										var process = new ffmpeg(path);
@@ -106,6 +110,8 @@ export async function POST(request) {
 								}
 							}
 						});
+
+					await new Promise((resolve) => setTimeout(resolve, 2500));
 
 					// Ajout du fichier à la base de données
 					const fileData = resourcesData.find((f) => f.nomFichier === file.name);

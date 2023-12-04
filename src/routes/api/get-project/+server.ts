@@ -31,15 +31,19 @@ export async function GET({ url }: { url: URL }) {
 		return new Resource(res.Path, res.isMain, res.Type as any);
 	});
 
-	const students = (
-		await StudentTable.findAll({
-			where: {
-				projectId: project.id
-			}
-		})
-	).map((res) => {
-		return new Student(res.prenom, res.nom, res.classe);
-	});
+	let students: Student[] = [];
+
+	if (project.hideStudentsNames === false) {
+		students = (
+			await StudentTable.findAll({
+				where: {
+					projectId: project.id
+				}
+			})
+		).map((res) => {
+			return new Student(res.prenom, res.nom, res.classe);
+		});
+	}
 
 	const answer = new Project(project.projectName, project.projectDescription, students, resources);
 
