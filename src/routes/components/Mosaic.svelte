@@ -115,11 +115,6 @@
 			grid-template-columns: repeat(21, minmax(0, 1fr));
 		}
 	}
-	@media (min-width: 1000px) {
-		.grid-cols {
-			grid-template-columns: repeat(16, minmax(0, 1fr));
-		}
-	}
 
 	@media (max-width: 639px) {
 		.grid-cols {
