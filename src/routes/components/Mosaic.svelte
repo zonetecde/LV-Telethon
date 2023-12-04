@@ -78,7 +78,7 @@
 							  nomFichier.replace('./uploaded', '/uploaded') +
 							  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
 						alt={projectId.toString()}
-						class="w-full aspect-square object-fill hover:scale-150 duration-150 hover:z-50 transition-all cursor-pointer projectInfo"
+						class="w-full aspect-square object-fill hover:scale-[3] duration-150 hover:z-50 transition-all cursor-pointer projectInfo"
 						on:mouseenter={handleMouseEnter}
 						on:mouseleave={handleMouseLeave}
 					/>
@@ -90,12 +90,15 @@
 	<img
 		src={Telethon}
 		alt=""
-		class="absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-80"
+		class="absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-60"
 	/>
 </div>
 
 {#if hoveredElementToShow}
-	<div class="md:absolute block w-full z-50" style="left: {offsetX}; top: {offsetY}">
+	<div
+		class="md:absolute block w-full z-50 overflow-hidden hidden"
+		style="left: {offsetX}; top: {offsetY}"
+	>
 		<ProjectInfo
 			{projectId}
 			on:mouseleave={() => {
@@ -109,13 +112,18 @@
 <style>
 	@media (min-width: 640px) {
 		.grid-cols {
-			grid-template-columns: repeat(25, minmax(0, 1fr));
+			grid-template-columns: repeat(21, minmax(0, 1fr));
+		}
+	}
+	@media (min-width: 1000px) {
+		.grid-cols {
+			grid-template-columns: repeat(16, minmax(0, 1fr));
 		}
 	}
 
 	@media (max-width: 639px) {
 		.grid-cols {
-			grid-template-columns: repeat(12, minmax(0, 1fr));
+			grid-template-columns: repeat(8, minmax(0, 1fr));
 		}
 	}
 </style>

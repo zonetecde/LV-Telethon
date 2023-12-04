@@ -9,7 +9,7 @@ export async function GET(request) {
 	initDb();
 
 	const projects = await ProjectTable.findAll();
-	let imagesPathPromises = projects.map(async (project) => {
+	const imagesPathPromises: any = projects.map(async (project) => {
 		const resources = (
 			await ResourceTable.findAll({
 				where: {
@@ -29,16 +29,16 @@ export async function GET(request) {
 	let imagesPath = await Promise.all(imagesPathPromises);
 
 	// Ajoute les autres projets qui ne sont pas dans la DB
-	const dir = '/static/uploaded';
+	const dir = './static/uploaded/';
 	const files = fs.readdirSync(dir);
 
 	for (const file of files) {
-		if (file.includes('_')) {
+		if (file.includes('_') && file.includes('.jpg')) {
 			imagesPath = [
 				...imagesPath,
 				{
 					projectId: -1,
-					imagePaths: [new Resource(file, true, 'image')]
+					imagePaths: [new Resource('/uploaded/' + file, true, 'image')]
 				}
 			];
 		}

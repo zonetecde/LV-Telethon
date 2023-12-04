@@ -23,7 +23,7 @@
 	>
 </div>
 
-<div class="main-bg w-screen h-screen -mt-20 pt-20 overflow-x-hidden">
+<div class="main-bg w-screen h-screen -mt-20 pt-20 overflow-x-hidden overflow-hidden">
 	<slot />
 </div>
 

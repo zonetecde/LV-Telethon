@@ -10,14 +10,11 @@ import { dbConnection, initDb } from '../database/db.js';
 export async function GET({ url }: { url: URL }) {
 	const projectId = url.searchParams.get('projectId') ?? 0;
 
-	if (projectId === '-1') {
-		// n'est pas dans la DB
-		return new Project('Espoir pour le Téléthon', '', [], []);
-	}
-
 	const project = await ProjectTable.findByPk(projectId);
 
 	if (!project) {
+		return new Response(JSON.stringify(new Project('Espoir pour le Téléthon', '', [], [])));
+
 		return new Response(JSON.stringify('Projet introuvable.'), { status: 404 });
 	}
 

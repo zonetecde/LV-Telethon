@@ -60,7 +60,7 @@
 	{#if project}
 		<h1 class="text-center text-xl font-bold">{project.projectName}</h1>
 
-		{#if project.projectDescription !== ''}
+		{#if project.projectDescription && project.projectDescription !== ''}
 			<h3 class="font-bold mt-3 text-left">Description du projet :</h3>
 			<p class=" text-left">{project.projectDescription}</p>
 		{/if}
