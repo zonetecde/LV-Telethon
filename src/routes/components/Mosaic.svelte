@@ -29,42 +29,28 @@
 	let hoveredElement: HTMLImageElement | null;
 	let hoveredElementToShow: HTMLImageElement | null;
 
-	function handleMouseEnter(event: MouseEvent) {
+	function handleMouseClick(event: MouseEvent) {
 		const target = event.target as HTMLImageElement;
 
-		hoveredElement = target;
+		projectId = parseInt(target.alt);
+		hoveredElementToShow = target;
 
-		setTimeout(() => {
-			const onPhone = window.innerWidth < 640; // Un simple clique suffit alors à afficher les informations
-			if (hoveredElement === target || onPhone) {
-				projectId = parseInt(target.alt);
-				hoveredElementToShow = target;
+		const INFORMATION_WIDTH = 700;
+		// Place la fenêtre d'information au centre bas de l'image
+		offsetX = `${target.offsetLeft - INFORMATION_WIDTH / 2}px`;
+		offsetY = `${target.offsetTop + target.offsetHeight / 2 - 20}px`;
 
-				const INFORMATION_WIDTH = 700;
-				// Place la fenêtre d'information au centre bas de l'image
-				offsetX = `${target.offsetLeft - INFORMATION_WIDTH / 2}px`;
-				offsetY = `${target.offsetTop + target.offsetHeight / 2 - 20}px`;
-
-				// Si on est sur les bords de l'écran, on décale la fenêtre d'information
-				if (target.offsetLeft < INFORMATION_WIDTH / 2) {
-					offsetX = `${target.offsetLeft}px`;
-				} else if (target.offsetLeft + INFORMATION_WIDTH / 2 > window.innerWidth) {
-					offsetX = `${window.innerWidth - INFORMATION_WIDTH}px`;
-				}
-			}
-		}, 750);
-	}
-
-	function handleMouseLeave(event: any) {
-		if (event.currentTarget.classList.contains('projectInfo') === false) {
-			hoveredElementToShow = null;
-			hoveredElement = null;
+		// Si on est sur les bords de l'écran, on décale la fenêtre d'information
+		if (target.offsetLeft < INFORMATION_WIDTH / 2) {
+			offsetX = `${target.offsetLeft}px`;
+		} else if (target.offsetLeft + INFORMATION_WIDTH / 2 > window.innerWidth) {
+			offsetX = `${window.innerWidth - INFORMATION_WIDTH}px`;
 		}
 	}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="bg-white w-full h-full" on:mouseenter={handleMouseLeave}>
+<div class="bg-white w-full h-full overflow-hidden">
 	<div class="w-full h-full grid grid-cols gap-0 place-content-start">
 		{#each imagesPath as { projectId, imagePaths }}
 			{#each imagePaths as { nomFichier, Type }, i}
@@ -79,8 +65,7 @@
 							  (Type === /* Path de la miniature de la vidéo */ 'video' ? '.jpg' : '')}
 						alt={projectId.toString()}
 						class="w-full aspect-square object-fill hover:scale-[3] duration-150 hover:z-50 transition-all cursor-pointer projectInfo"
-						on:mouseenter={handleMouseEnter}
-						on:mouseleave={handleMouseLeave}
+						on:click={handleMouseClick}
 					/>
 				{/if}
 			{/each}
@@ -96,7 +81,7 @@
 
 {#if hoveredElementToShow}
 	<div
-		class="md:absolute block w-full z-50 overflow-hidden hidden"
+		class="md:absolute block w-full z-50 overflow-hidden"
 		style="left: {offsetX}; top: {offsetY}"
 	>
 		<ProjectInfo

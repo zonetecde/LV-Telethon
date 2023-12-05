@@ -13,8 +13,6 @@ export async function GET({ url }: { url: URL }) {
 	const project = await ProjectTable.findByPk(projectId);
 
 	if (!project) {
-		return new Response(JSON.stringify(new Project('Espoir pour le Téléthon', '', [], [])));
-
 		return new Response(JSON.stringify('Projet introuvable.'), { status: 404 });
 	}
 

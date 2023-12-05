@@ -5,7 +5,7 @@
 	import Student from '../../Models/Student.js';
 
 	export let projectId: number = 0;
-	let project: Project;
+	let project: Project | null = null;
 
 	let isUnderDev = false;
 
@@ -20,15 +20,21 @@
 
 		const response = await fetch('/api/get-project?projectId=' + projectId);
 
+		if (response.status === 404) {
+			project = null;
+			return;
+		}
+
 		project = await response.json();
 	});
 
 	$: {
 		projectId;
 		if (mounted) {
-			fetch('/api/get-project?projectId=' + projectId).then(
-				async (response) => (project = await response.json())
-			);
+			fetch('/api/get-project?projectId=' + projectId).then(async (response) => {
+				if (response.status === 404) return (project = null);
+				project = await response.json();
+			});
 		}
 	}
 
@@ -111,6 +117,6 @@
 			</p>
 		{/if}
 	{:else}
-		<h1>Chargement...</h1>
+		<h1>Ce projet n'a pas de détail.</h1>
 	{/if}
 </div>
